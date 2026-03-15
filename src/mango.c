@@ -4179,6 +4179,10 @@ mapnotify(struct wl_listener *listener, void *data) {
 	// set border color
 	setborder_color(c);
 
+	if (ISTILED(c)) {
+		warp_cursor(c);
+	}
+
 	// make sure the animation is open type
 	c->is_pending_open_animation = true;
 	resize(c, c->geom, 0);
@@ -6086,6 +6090,10 @@ void unmapnotify(struct wl_listener *listener, void *data) {
 	wlr_scene_node_destroy(&c->scene->node);
 	printstatus();
 	motionnotify(0, NULL, 0, 0, 0, 0);
+
+	if (nextfocus && config.warpcursor) {
+		warp_cursor(nextfocus);
+	}
 }
 
 void updatemons(struct wl_listener *listener, void *data) {

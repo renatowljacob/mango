@@ -129,8 +129,12 @@ int32_t exchange_stack_client(const Arg *arg) {
 	} else {
 		tc = get_next_stack_client(c, true);
 	}
-	if (tc)
+	if (tc) {
+		if (config.warpcursor) {
+			warp_cursor(tc);
+		}
 		exchange_two_client(c, tc);
+	}
 	return 0;
 }
 
@@ -1624,7 +1628,11 @@ int32_t zoom(const Arg *arg) {
 	wl_list_insert(&clients, &sel->link);
 
 	focusclient(sel, 1);
+
 	arrange(selmon, false, false);
+	if (config.warpcursor) {
+		warp_cursor(sel);
+	}
 	return 0;
 }
 
