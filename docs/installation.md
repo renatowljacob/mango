@@ -185,7 +185,7 @@ mangowm is available in the **PikaOS package repository**.
 You can install it using the `pikman` package manager:
 
 ```bash
-pikman install mangowc
+pikman install mangowm
 ```
 
 ---
@@ -214,7 +214,7 @@ You will need to build `wlroots` and `scenefx` manually as well.
 1. **Build wlroots**
    Clone and install the specific version required (check README for latest version).
    ```bash
-   git clone -b 0.19.2 https://gitlab.freedesktop.org/wlroots/wlroots.git
+   git clone -b 0.19.3 https://gitlab.freedesktop.org/wlroots/wlroots.git
    cd wlroots
    meson build -Dprefix=/usr
    sudo ninja -C build install

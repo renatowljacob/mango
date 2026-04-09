@@ -27,7 +27,7 @@ windowrule=Parameter:Values,Parameter:Values,appid:Values,title:Values
 | `isoverlay` | integer | `0` / `1` | Make it always in top layer |
 | `isopensilent` | integer | `0` / `1` | Open without focus |
 | `istagsilent` | integer | `0` / `1` | Don't focus if client is not in current view tag |
-| `force_maximize` | integer | `0` / `1` (default 1) | The state of client default to maximized |
+| `force_fakemaximize` | integer | `0` / `1` (default 1) | The state of client set to fake maximized |
 | `ignore_maximize` | integer | `0` / `1` (default 1) | Don't handle maximize request from client |
 | `ignore_minimize` | integer | `0` / `1` (default 1) | Don't handle minimize request from client |
 | `force_tiled_state` | integer | `0` / `1` | Deceive the window into thinking it is tiling, so it better adheres to assigned dimensions |
@@ -179,6 +179,7 @@ tagrule=id:Values,monitor_make:xxx,monitor_model:xxx,Parameter:Values
 | `monitor_serial` | string | monitor serial | Match by monitor serial number |
 | `layout_name` | string | layout name | Layout name to set |
 | `no_render_border` | integer | `0` / `1` | Disable render border |
+| `open_as_floating` | integer | `0` / `1` | New open window will be floating|
 | `no_hide` | integer | `0` / `1` | Not hide even if the tag is empty |
 | `nmaster` | integer | 0, 99 | Number of master windows |
 | `mfact` | float | 0.1–0.9 | Master area factor |
