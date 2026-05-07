@@ -510,6 +510,88 @@ struct ivec2 clip_to_hide(Client *c, struct wlr_box *clip_box) {
 	return offset;
 }
 
+void client_set_drop_area(Client *c) {
+	bool first_draw = false;
+	int32_t drop_direction = UNDIR;
+
+	if (!c->enable_drop_area_draw && !c->droparea->node.enabled) {
+		return;
+	}
+
+	if (!c->enable_drop_area_draw && c->droparea->node.enabled) {
+		wlr_scene_node_lower_to_bottom(&c->droparea->node);
+		wlr_scene_node_set_enabled(&c->droparea->node, false);
+		return;
+	} else if (c->enable_drop_area_draw && !c->droparea->node.enabled) {
+		wlr_scene_node_raise_to_top(&c->droparea->node);
+		wlr_scene_node_set_enabled(&c->droparea->node, true);
+		first_draw = true;
+	}
+
+	int32_t bw = (int32_t)c->bw;
+	int32_t client_width = c->geom.width - 2 * bw;
+	int32_t client_height = c->geom.height - 2 * bw;
+
+	// 光标在窗口客户区内的相对坐标
+	double rel_x = cursor->x - c->geom.x - bw;
+	double rel_y = cursor->y - c->geom.y - bw;
+
+	struct wlr_box drop_box;
+
+	// 中心区域：x和y都在30%~70%之间 → 无方向
+	if (rel_x > client_width * 0.3 && rel_x < client_width * 0.7 &&
+		rel_y > client_height * 0.3 && rel_y < client_height * 0.7) {
+		drop_box.x = bw + client_width * 0.3;
+		drop_box.y = bw + client_height * 0.3;
+		drop_box.width = client_width * 0.4;
+		drop_box.height = client_height * 0.4;
+		drop_direction = UNDIR;
+	} else {
+		// 否则根据到各边的距离决定方向
+		double dist_left = rel_x;
+		double dist_right = client_width - rel_x;
+		double dist_top = rel_y;
+		double dist_bottom = client_height - rel_y;
+
+		// 找出最小距离的方向（相等时按左、右、上、下的优先级顺序）
+		if (dist_left <= dist_right && dist_left <= dist_top &&
+			dist_left <= dist_bottom) {
+			drop_direction = LEFT;
+			drop_box.x = bw;
+			drop_box.y = bw;
+			drop_box.width = client_width * 0.3;
+			drop_box.height = client_height;
+		} else if (dist_right <= dist_top && dist_right <= dist_bottom) {
+			drop_direction = RIGHT;
+			drop_box.x = bw + client_width * 0.7;
+			drop_box.y = bw;
+			drop_box.width = client_width * 0.3;
+			drop_box.height = client_height;
+		} else if (dist_top <= dist_bottom) {
+			drop_direction = UP;
+			drop_box.x = bw;
+			drop_box.y = bw;
+			drop_box.width = client_width;
+			drop_box.height = client_height * 0.3;
+		} else {
+			drop_direction = DOWN;
+			drop_box.x = bw;
+			drop_box.y = bw + client_height * 0.7;
+			drop_box.width = client_width;
+			drop_box.height = client_height * 0.3;
+		}
+	}
+
+	// 如果方向和上次相同且不是第一次绘制，则跳过更新
+	if (!first_draw && c->drop_direction == drop_direction) {
+		return;
+	}
+	c->drop_direction = drop_direction;
+
+	wlr_scene_node_set_position(&c->droparea->node, drop_box.x, drop_box.y);
+	wlr_scene_rect_set_size(c->droparea, drop_box.width, drop_box.height);
+}
+
 void client_apply_clip(Client *c, float factor) {
 
 	if (c->iskilling || !client_surface(c)->mapped)
